@@ -1,0 +1,9 @@
+chamathnirmal99
+YhzS2Q0kjzfl8HOg
+
+
+
+mongodb+srv://chamathnirmal99:YhzS2Q0kjzfl8HOg@cluster0.xw15awt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+
+
+npm install --save mongoose

@@ -123,6 +123,23 @@ app.put('/api/post/:id', async (req,res,next) =>{
     
 });
 
+//DELETE BY-ID - DELETE API
+app.delete('/api/post/:id',(req,res,next)=>{
+    console.log("DELETE>>/api/post/:id");
+    const _id = req.params.id;
+    const filter = {_id:new ObjectId(_id)};
+    
+    Post.deleteOne(filter).then((result) => {
+        console.log(result);
+
+        res.status(200).json({
+            message:"Post Deleted"
+        });
+        
+    });
+
+});
+
 // app.use((req,res,next) =>{
 //     console.log('this is from express');
 // });

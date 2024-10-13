@@ -3,9 +3,6 @@ const app = express();
 const bodyParser  = require('body-parser');
 
 const Post = require('./models/post.js');
-const postRoutes = require('./routes/posts.js');
-const usersRoutes = require('./routes/users.js');
-const taskRoutes = require('./routes/tasks.js');
 
 const mongoose = require('mongoose');
 const ObjectId = require('mongodb').ObjectId;
@@ -30,126 +27,101 @@ app.use((req,res,next)=>{
     next();
 });
 
-// app.use((req,res,next) =>{
-//     console.log('this is from express');
-//     next();
-// });
+//POST API
+app.post("/api/posts",(req,res,next)=>{
+    console.log(">>/api/post");
+    const reqBody = req.body;
+    console.log(reqBody);
 
-//access custom routes (some of using /posts and some of /post so i make 2 in here)
-app.use('/api/posts',postRoutes);
-app.use('/api/post',postRoutes);
-app.use('/api/user',usersRoutes);
-app.use('/api/task',taskRoutes);
-
-
-//all api are commented in lesson 6-7 . because develop the routes.
-
-// //POST API
-//move this code to posts.js file
-// app.post("/api/posts",(req,res,next)=>{
-//     console.log(">>/api/post");
-//     const reqBody = req.body;
-//     console.log(reqBody);
-
-//     //mongoose using
-//     const post = new Post({
-//         title:req.body.title,
-//         content:req.body.content
-//     });
+    //mongoose using
+    const post = new Post({
+        title:req.body.title,
+        content:req.body.content
+    });
     
-//     console.log(post);
-//     post.save();
+    console.log(post);
+    post.save();
 
-//     res.status(200).json({
-//       message:"post added successfully"
-//     })
-//     next(); 
-// });
+    res.status(200).json({
+      message:"post added successfully"
+    })
+    next(); 
+});
 
+//GET ALL Posts - GET API
+app.get('/api/posts',(req,res,next)=>{
+    console.log("GET>>/api/posts");
 
-// //GET ALL Posts - GET API
-// app.get('/api/posts',(req,res,next)=>{
-//     console.log("GET>>/api/posts");
-
-//     Post.find().then((document)=>{
-//         console.log(document);
-//         res.status(200).json({
-//             message:"list all posts",
-//             posts:document
-//         });
+    Post.find().then((document)=>{
+        console.log(document);
+        res.status(200).json({
+            message:"list all posts",
+            posts:document
+        });
         
-//     }); 
-// });
+    }); 
+});
 
-// //GET Post BY-ID - GET API
-// app.get('/api/post/:id',(req,res,next)=>{
-//     console.log("GET>>/api/post/:id");
-//     const _id = req.params.id;
-//     console.log(_id);
+//GET Post BY-ID - GET API
+app.get('/api/post/:id',(req,res,next)=>{
+    console.log("GET>>/api/post/:id");
+    const _id = req.params.id;
+    console.log(_id);
 
-//     const objId = new ObjectId(_id);
-//     Post.findById(objId).then( doc => {
-//         console.log("found"+doc);
-//         res.status(200).json(doc);
-//     })
-//     .catch( err => {
-//         console.log(err);
-//     })
-// });
+    const objId = new ObjectId(_id);
+    Post.findById(objId).then( doc => {
+        console.log("found"+doc);
+        res.status(200).json(doc);
+    })
+    .catch( err => {
+        console.log(err);
+    })
+});
 
+// GET API SERVER CHECKING
+app.get("/healthCheck",(req,res,next)=>{
+    console.log(">>/healthCheck");
+    res.status(200).json({
+        message:"server running....."
+    })
+    next();
+});
 
-// //DELETE BY-ID - DELETE API
-// app.delete('/api/posts/:id',(req,res,next)=>{
-//     console.log("DELETE>>/api/post/:id");
-//     const _id = req.params.id;
-//     const filter = {_id:new ObjectId(_id)};
+//PUT API 
+app.put('/api/post/:id', async (req,res,next) =>{
+    console.log("put>>/api/post/:id");
+
+    const postId = req.params.id;
+    console.log(postId);
     
-//     Post.deleteOne(filter).then((result) => {
-//         console.log(result);
-
-//         res.status(200).json({
-//             message:"Post Deleted"
-//         });
-        
-//     });
-
-// });
-
-// //PUT API 
-// app.put('/api/post/:id', async (req,res,next) =>{
-//     console.log("put>>/api/post/:id");
-
-//     const postId = req.params.id;
-//     console.log(postId);
+    const { title,content } = req.body;
+    console.log("content: "+content);
+    console.log("title: "+title);
     
-//     const { title,content } = req.body;
-//     console.log("content: "+content);
-//     console.log("title: "+title);
+    const filter = { _id: new ObjectId(postId)};
+    const updateDoc = { title:title,content:content }
+
+    try {
+        const updatedDocument = await Post.findByIdAndUpdate(
+            filter,
+            updateDoc,
+            {new:true}
+        );
+
+        res.status(200).json(updatedDocument);
+
+    } catch (err) {
+        console.log('Error in update record' + err);
+        return res.status(500).json({
+            error:"Internal server error occur"
+        })
+
+    }
+    // res.status(200).json({
+    //     message: "success"
+    // });
     
-//     const filter = { _id: new ObjectId(postId)};
-//     const updateDoc = { title:title,content:content }
-
-//     try {
-//         const updatedDocument = await Post.findByIdAndUpdate(
-//             filter,
-//             updateDoc,
-//             {new:true}
-//         );
-
-//         res.status(200).json(updatedDocument);
-
-//     } catch (err) {
-//         console.log('Error in update record' + err);
-//         return res.status(500).json({
-//             error:"Internal server error occur"
-//         })
-
-//     }
-//     // res.status(200).json({
-//     //     message: "success"
-//     // });
-    
-// });
+});
 
 //DELETE BY-ID - DELETE API
 app.delete('/api/post/:id',(req,res,next)=>{
@@ -170,18 +142,8 @@ app.delete('/api/post/:id',(req,res,next)=>{
 
 // app.use((req,res,next) =>{
 //     console.log('this is from express');
-//     next();
 // });
 
-
-// GET API SERVER CHECKING
-app.get("/healthCheck",(req,res,next)=>{
-    console.log(">>/healthCheck");
-    res.status(200).json({
-        message:"server running....."
-    })
-    next();
-});
 
 module.exports = app;
 

@@ -1,0 +1,16 @@
+https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-up-node-on-ec2-instance.html
+
+
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+
+need to run ater created linux server. this command can setup node in linux.
+
+
+source ~/.bashrc
+
+nvm install --lts
+
+node -e "console.log('Running Node.js ' + process.version)"
+
+
+now successfully installed node
